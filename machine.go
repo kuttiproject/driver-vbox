@@ -296,6 +296,10 @@ func (vh *Machine) get() error {
 		return fmt.Errorf("machine %s not found", vh.name)
 	}
 
+	// If machine properties could be retrieved, assume the machine is in
+	// Stopped state. Parsing the properties may change this.
+	vh.status = drivercore.MachineStatusStopped
+
 	if output != "" {
 		vh.parseProps(output)
 	}
