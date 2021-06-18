@@ -31,5 +31,7 @@ func findvboxmanage() (string, error) {
 	}
 
 	// Give up
-	return "", err
+	return "", errors.New(
+		"VBoxManage.exe not found. Please ensure that Oracle VirtualBox 6.0 or greater is installed, and VBoxManage.exe utility is on your PATH",
+	)
 }

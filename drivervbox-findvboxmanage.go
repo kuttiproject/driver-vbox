@@ -2,7 +2,10 @@
 
 package drivervbox
 
-import "os/exec"
+import (
+	"errors"
+	"os/exec"
+)
 
 func findvboxmanage() (string, error) {
 
@@ -13,5 +16,7 @@ func findvboxmanage() (string, error) {
 	}
 
 	// Give up
-	return "", err
+	return "", errors.New(
+		"VBoxManage not found. Please ensure that Oracle VirtualBox 6.0 or greater is installed, and the VBoxManage utility is on your PATH",
+	)
 }

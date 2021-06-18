@@ -2,7 +2,7 @@ package drivervbox
 
 const (
 	driverName         = "vbox"
-	driverDescription  = "Kutti driver for VirtualBox >=6.0"
+	driverDescription  = "Kutti driver for VirtualBox 6.0 and above"
 	networkNameSuffix  = "kuttinet"
 	networkNamePattern = "*" + networkNameSuffix
 	dhcpaddress        = "192.168.125.3"
@@ -27,7 +27,7 @@ func (vd *Driver) Name() string {
 	return driverName
 }
 
-// Description returns "Kutti driver for VirtualBox >=6.0"
+// Description returns "Kutti driver for VirtualBox 6.0 and above"
 func (vd *Driver) Description() string {
 	return driverDescription
 }
@@ -43,7 +43,11 @@ func (vd *Driver) Status() string {
 }
 
 func (vd *Driver) Error() string {
-	panic("not implemented") // TODO: Implement
+	if vd.status != "Error" {
+		return ""
+	}
+
+	return vd.errormessage
 }
 
 func trimQuotes(s string) string {
