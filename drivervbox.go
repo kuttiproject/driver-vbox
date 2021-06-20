@@ -8,13 +8,12 @@ import (
 )
 
 func init() {
-	driver, err := newvboxdriver()
-	if err == nil {
-		drivercore.RegisterDriver("vbox", driver)
-	}
+	driver := newvboxdriver()
+
+	drivercore.RegisterDriver("vbox", driver)
 }
 
-func newvboxdriver() (*Driver, error) {
+func newvboxdriver() *Driver {
 	result := &Driver{}
 
 	// find VBoxManage tool and set it
@@ -22,8 +21,9 @@ func newvboxdriver() (*Driver, error) {
 	if err != nil {
 		result.status = "Error"
 		result.errormessage = err.Error()
-		return result, err
+		return result
 	}
+
 	result.vboxmanagepath = vbmpath
 
 	// test VBoxManage version
@@ -31,7 +31,7 @@ func newvboxdriver() (*Driver, error) {
 	if err != nil {
 		result.status = "Error"
 		result.errormessage = err.Error()
-		return result, err
+		return result
 	}
 	var majorversion int
 	_, err = fmt.Sscanf(vbmversion, "%d", &majorversion)
@@ -39,9 +39,9 @@ func newvboxdriver() (*Driver, error) {
 		err = fmt.Errorf("unsupported VBoxManage version %v. 6.0 and above are supported", vbmversion)
 		result.status = "Error"
 		result.errormessage = err.Error()
-		return result, err
+		return result
 	}
 
 	result.status = "Ready"
-	return result, nil
+	return result
 }
