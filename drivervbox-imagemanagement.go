@@ -10,10 +10,10 @@ import (
 	"github.com/kuttiproject/workspace"
 )
 
-const imagesConfigFile = "vboximages.json"
+const imagesConfigFile = "driver-vbox-images.json"
 
 // ImagesSourceURL is the location where the master list of images can be found
-var ImagesSourceURL = "https://github.com/rajch/kutti-images/releases/download/v0.1.13-beta/kutti-images.json"
+var ImagesSourceURL = "https://github.com/kuttiproject/driver-vbox-images/releases/download/v0.2/driver-vbox-images.json"
 
 var (
 	imagedata             = &imageconfigdata{}
@@ -133,11 +133,11 @@ func fetchimagelist() error {
 	for key, newimage := range tempimagedata.images {
 		oldimage := imagedata.images[key]
 		if oldimage != nil &&
-			newimage.ImageChecksum == oldimage.ImageChecksum &&
-			newimage.ImageSourceURL == oldimage.ImageSourceURL &&
-			oldimage.ImageStatus == drivercore.ImageStatusDownloaded {
+			newimage.imageChecksum == oldimage.imageChecksum &&
+			newimage.imageSourceURL == oldimage.imageSourceURL &&
+			oldimage.imageStatus == drivercore.ImageStatusDownloaded {
 
-			newimage.ImageStatus = drivercore.ImageStatusDownloaded
+			newimage.imageStatus = drivercore.ImageStatusDownloaded
 		}
 	}
 

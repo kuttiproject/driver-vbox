@@ -32,7 +32,7 @@ func (vd *Driver) K8sVersions() []string {
 	result := make([]string, len(imagedata.images))
 	index := 0
 	for _, value := range imagedata.images {
-		result[index] = value.ImageK8sVersion
+		result[index] = value.imageK8sVersion
 		index++
 	}
 

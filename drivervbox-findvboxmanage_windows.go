@@ -3,6 +3,7 @@
 package drivervbox
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"path"
