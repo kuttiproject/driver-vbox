@@ -9,7 +9,7 @@ import (
 	"github.com/kuttiproject/workspace"
 )
 
-// QualifiedNetworkName adds a 'kuttinet' prefix to the specified cluster name.
+// QualifiedNetworkName adds a 'kuttinet' suffix to the specified cluster name.
 func (vd *Driver) QualifiedNetworkName(clustername string) string {
 	return clustername + "kuttinet"
 }

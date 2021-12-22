@@ -13,15 +13,24 @@ import (
 	"github.com/kuttiproject/workspace"
 )
 
+// The version and checksum of the driver-vbox image
+// to use for the test.
+const (
+	TESTK8SVERSION  = "1.23"
+	TESTK8SCHECKSUM = "8b18b91c670b62e91a0b179753a1c1b778ea5e1ffa300ca1309ec7098d8dbbc3"
+)
+
 func TestDriverVBox(t *testing.T) {
 	// kuttilog.Setloglevel(kuttilog.Debug)
 
 	// Set up dummy web server for updating image list
 	// and downloading image
-	_, err := os.Stat("out/testserver/kutti-1.18.ova")
+	_, err := os.Stat(fmt.Sprintf("out/testserver/kutti-%v.ova", TESTK8SVERSION))
 	if err != nil {
-		t.Fatal(
-			"Please download the version 1.18 kutti image, and place it in the path out/testserver/kutti-1.18.ova",
+		t.Fatalf(
+			"Please download the version %v kutti image, and place it in the path out/testserver/kutti-%v.ova",
+			TESTK8SVERSION,
+			TESTK8SVERSION,
 		)
 	}
 
@@ -32,17 +41,24 @@ func TestDriverVBox(t *testing.T) {
 	serverMux.HandleFunc(
 		"/images.json",
 		func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprintf(w, `{"1.18":{"ImageK8sVersion":"1.18","ImageChecksum":"a053e6910c55e19bbd2093b0129f25aa69ceee9b0e0a52505dfd9d8b3eb24090","ImageStatus":"NotDownloaded", "ImageSourceURL":"http://localhost:8181/kutti-1.18.ova"}}`)
+			fmt.Fprintf(
+				w,
+				`{"%v":{"ImageK8sVersion":"%v","ImageChecksum":"%v","ImageStatus":"NotDownloaded", "ImageSourceURL":"http://localhost:8181/kutti-%v.ova"}}`,
+				TESTK8SVERSION,
+				TESTK8SVERSION,
+				TESTK8SCHECKSUM,
+				TESTK8SVERSION,
+			)
 		},
 	)
 
 	serverMux.HandleFunc(
-		"/kutti-1.18.ova",
+		fmt.Sprintf("/kutti-%v.ova", TESTK8SVERSION),
 		func(rw http.ResponseWriter, r *http.Request) {
 			http.ServeFile(
 				rw,
 				r,
-				"out/testserver/kutti-1.18.ova",
+				fmt.Sprintf("out/testserver/kutti-%v.ova", TESTK8SVERSION),
 			)
 		},
 	)
@@ -67,5 +83,5 @@ func TestDriverVBox(t *testing.T) {
 
 	drivervbox.ImagesSourceURL = "http://localhost:8181/images.json"
 
-	drivercoretest.TestDriver(t, "vbox", "1.18")
+	drivercoretest.TestDriver(t, "vbox", TESTK8SVERSION)
 }
