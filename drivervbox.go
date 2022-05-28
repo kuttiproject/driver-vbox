@@ -10,7 +10,7 @@ import (
 func init() {
 	driver := newvboxdriver()
 
-	drivercore.RegisterDriver("vbox", driver)
+	drivercore.RegisterDriver(driverName, driver)
 }
 
 func newvboxdriver() *Driver {

@@ -76,7 +76,7 @@ func TestDriverVBox(t *testing.T) {
 
 	<-time.After(5 * time.Second)
 
-	err = workspace.Set("/home/raj/projects/kuttiproject/driver-vbox/out")
+	err = workspace.Set("out/")
 	if err != nil {
 		t.Fatalf("Error: %v", err)
 	}

@@ -10,10 +10,14 @@ import (
 	"github.com/kuttiproject/workspace"
 )
 
+// ImagesVersion defines the image repository version for the current version
+// of the driver.
+const ImagesVersion = "0.2"
+
 const imagesConfigFile = "driver-vbox-images.json"
 
 // ImagesSourceURL is the location where the master list of images can be found
-var ImagesSourceURL = "https://github.com/kuttiproject/driver-vbox-images/releases/download/v0.2/driver-vbox-images.json"
+var ImagesSourceURL = "https://github.com/kuttiproject/driver-vbox-images/releases/download/v" + ImagesVersion + "/" + imagesConfigFile
 
 var (
 	imagedata             = &imageconfigdata{}
@@ -42,7 +46,7 @@ func (icd *imageconfigdata) Setdefaults() {
 }
 
 func vboxCacheDir() (string, error) {
-	return workspace.Cachesubdir("vbox")
+	return workspace.Cachesubdir("driver-vbox")
 }
 
 func vboxConfigDir() (string, error) {

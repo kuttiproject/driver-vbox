@@ -22,7 +22,7 @@ type Driver struct {
 	errormessage   string
 }
 
-// Name returns the "vbox"
+// Name returns "vbox"
 func (vd *Driver) Name() string {
 	return driverName
 }
@@ -30,6 +30,11 @@ func (vd *Driver) Name() string {
 // Description returns "Kutti driver for VirtualBox 6.0 and above"
 func (vd *Driver) Description() string {
 	return driverDescription
+}
+
+// UsesPerClusterNetworking returns true
+func (vd *Driver) UsesPerClusterNetworking() bool {
+	return true
 }
 
 // UsesNATNetworking returns true
