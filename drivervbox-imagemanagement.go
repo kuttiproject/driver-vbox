@@ -12,7 +12,7 @@ import (
 
 // ImagesVersion defines the image repository version for the current version
 // of the driver.
-const ImagesVersion = "0.2"
+const ImagesVersion = "0.3"
 
 const imagesConfigFile = "driver-vbox-images.json"
 
