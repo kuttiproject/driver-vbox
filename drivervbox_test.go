@@ -17,7 +17,7 @@ import (
 // to use for the test.
 const (
 	TESTK8SVERSION  = "1.23"
-	TESTK8SCHECKSUM = "8b18b91c670b62e91a0b179753a1c1b778ea5e1ffa300ca1309ec7098d8dbbc3"
+	TESTK8SCHECKSUM = "2c9a6a24175f5589200b269f75f4043f4e97ed1ec7088f2d14a37a689624d770"
 )
 
 func TestDriverVBox(t *testing.T) {

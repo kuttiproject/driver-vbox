@@ -3,6 +3,7 @@ package drivervbox
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -11,6 +12,10 @@ import (
 	"github.com/kuttiproject/kuttilog"
 	"github.com/kuttiproject/workspace"
 )
+
+func machinesBaseDir() (string, error) {
+	return workspace.Cachesubdir("driver-vbox-machines")
+}
 
 // QualifiedMachineName returns a name in the form <clustername>-<machinename>
 func (vd *Driver) QualifiedMachineName(machinename string, clustername string) string {
@@ -113,6 +118,9 @@ var ipRegex, _ = regexp.Compile(`^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-
 // The first imports from an .ova file (easiest way to get fully configured VM), while
 // setting the VM name. The second connects the first network interface card to
 // the NAT network.
+// This function may return nil and an error, or a Machine and an error.
+// In the second case, if the caller does not actually want the machine, they should
+// call DeleteMachine afterwards.
 func (vd *Driver) NewMachine(machinename string, clustername string, k8sversion string) (drivercore.Machine, error) {
 	qualifiedmachinename := vd.QualifiedMachineName(machinename, clustername)
 
@@ -127,6 +135,17 @@ func (vd *Driver) NewMachine(machinename string, clustername string, k8sversion 
 		return nil, fmt.Errorf("could not retrieve image %s: %v", ovafile, err)
 	}
 
+	machinebasedir, err := machinesBaseDir()
+	if err != nil {
+		return nil, err
+	}
+
+	// Risk: convert path to absolute
+	absmachinebasedir, err := filepath.Abs(machinebasedir)
+	if err != nil {
+		return nil, err
+	}
+
 	l, err := workspace.Runwithresults(
 		vd.vboxmanagepath,
 		"import",
@@ -139,6 +158,10 @@ func (vd *Driver) NewMachine(machinename string, clustername string, k8sversion 
 		"0",
 		"--group",
 		"/"+clustername,
+		"--vsys",
+		"0",
+		"--basefolder",
+		absmachinebasedir,
 	)
 
 	if err != nil {
