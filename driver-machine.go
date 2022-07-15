@@ -35,6 +35,10 @@ As of VBoxManage 6.0.8r130520, the format is:
 
 */
 func (vd *Driver) ListMachines() ([]drivercore.Machine, error) {
+	if !vd.validate() {
+		return nil, vd
+	}
+
 	output, err := workspace.Runwithresults(
 		vd.vboxmanagepath,
 		"list",
@@ -72,6 +76,10 @@ func (vd *Driver) ListMachines() ([]drivercore.Machine, error) {
 //   VBoxManage guestproperty enumerate <machinename> --patterns "/VirtualBox/GuestInfo/Net/0/*|/kutti/*|/VirtualBox/GuestInfo/OS/LoggedInUsers"
 // and parsing the enumerated properties.
 func (vd *Driver) GetMachine(machinename string, clustername string) (drivercore.Machine, error) {
+	if !vd.validate() {
+		return nil, vd
+	}
+
 	machine := &Machine{
 		driver:      vd,
 		name:        machinename,
@@ -92,6 +100,10 @@ func (vd *Driver) GetMachine(machinename string, clustername string) (drivercore
 // It does this by running the command:
 //   VBoxManage unregistervm "<hostname>" --delete
 func (vd *Driver) DeleteMachine(machinename string, clustername string) error {
+	if !vd.validate() {
+		return vd
+	}
+
 	qualifiedmachinename := vd.QualifiedMachineName(machinename, clustername)
 	output, err := workspace.Runwithresults(
 		vd.vboxmanagepath,
@@ -122,9 +134,13 @@ var ipRegex, _ = regexp.Compile(`^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-
 // In the second case, if the caller does not actually want the machine, they should
 // call DeleteMachine afterwards.
 func (vd *Driver) NewMachine(machinename string, clustername string, k8sversion string) (drivercore.Machine, error) {
+	if !vd.validate() {
+		return nil, vd
+	}
+
 	qualifiedmachinename := vd.QualifiedMachineName(machinename, clustername)
 
-	kuttilog.Println(2, "Importing image...")
+	kuttilog.Println(kuttilog.Info, "Importing image...")
 
 	ovafile, err := imagepathfromk8sversion(k8sversion)
 	if err != nil {
@@ -169,7 +185,7 @@ func (vd *Driver) NewMachine(machinename string, clustername string, k8sversion 
 	}
 
 	// Attach newly created VM to NAT Network
-	kuttilog.Println(2, "Attaching host to network...")
+	kuttilog.Println(kuttilog.Info, "Attaching host to network...")
 	newmachine := &Machine{
 		driver:      vd,
 		name:        machinename,
@@ -195,7 +211,7 @@ func (vd *Driver) NewMachine(machinename string, clustername string, k8sversion 
 	}
 
 	// Start the host
-	kuttilog.Println(2, "Starting host...")
+	kuttilog.Println(kuttilog.Info, "Starting host...")
 	err = newmachine.Start()
 	if err != nil {
 		return newmachine, err
@@ -205,19 +221,19 @@ func (vd *Driver) NewMachine(machinename string, clustername string, k8sversion 
 
 	// Change the name
 	for renameretries := 1; renameretries < 4; renameretries++ {
-		kuttilog.Printf(2, "Renaming host (attempt %v/3)...", renameretries)
+		kuttilog.Printf(kuttilog.Info, "Renaming host (attempt %v/3)...", renameretries)
 		err = renamemachine(newmachine, machinename)
 		if err == nil {
 			break
 		}
-		kuttilog.Printf(2, "Failed. Waiting %v seconds before retry...", renameretries*10)
+		kuttilog.Printf(kuttilog.Info, "Failed. Waiting %v seconds before retry...", renameretries*10)
 		time.Sleep(time.Duration(renameretries*10) * time.Second)
 	}
 
 	if err != nil {
 		return newmachine, err
 	}
-	kuttilog.Println(2, "Host renamed.")
+	kuttilog.Println(kuttilog.Info, "Host renamed.")
 
 	// Save the IP Address
 	// The first IP address should be DHCP-assigned, and therefore start with
@@ -227,7 +243,7 @@ func (vd *Driver) NewMachine(machinename string, clustername string, k8sversion 
 	// times.
 	ipSet := false
 	for ipretries := 1; ipretries < 4; ipretries++ {
-		kuttilog.Printf(2, "Fetching IP address (attempt %v/3)...", ipretries)
+		kuttilog.Printf(kuttilog.Info, "Fetching IP address (attempt %v/3)...", ipretries)
 
 		var ipaddress string
 		ipprops := []string{propIPAddress, propIPAddress2, propIPAddress3}
@@ -243,20 +259,20 @@ func (vd *Driver) NewMachine(machinename string, clustername string, k8sversion 
 				}
 			}
 
-			if kuttilog.V(4) {
-				kuttilog.Printf(4, "value of property %v is %v, and present is %v.", ipprop, ipaddr, present)
-				kuttilog.Printf(4, "Regex match is %v, and prefix match is %v.", ipRegex.MatchString(ipaddr), strings.HasPrefix(ipaddr, ipNetAddr))
+			if kuttilog.V(kuttilog.Debug) {
+				kuttilog.Printf(kuttilog.Debug, "value of property %v is %v, and present is %v.", ipprop, ipaddr, present)
+				kuttilog.Printf(kuttilog.Debug, "Regex match is %v, and prefix match is %v.", ipRegex.MatchString(ipaddr), strings.HasPrefix(ipaddr, ipNetAddr))
 			}
 		}
 
 		if ipaddress != "" {
-			kuttilog.Printf(2, "Obtained IP address '%v'", ipaddress)
+			kuttilog.Printf(kuttilog.Info, "Obtained IP address '%v'", ipaddress)
 			newmachine.setproperty(propSavedIPAddress, ipaddress)
 			ipSet = true
 			break
 		}
 
-		kuttilog.Printf(2, "Failed. Waiting %v seconds before retry...", ipretries*10)
+		kuttilog.Printf(kuttilog.Info, "Failed. Waiting %v seconds before retry...", ipretries*10)
 		time.Sleep(time.Duration(ipretries*10) * time.Second)
 	}
 
@@ -264,7 +280,7 @@ func (vd *Driver) NewMachine(machinename string, clustername string, k8sversion 
 		kuttilog.Printf(0, "Error: Failed to get IP address. You may have to delete this node and recreate it manually.")
 	}
 
-	kuttilog.Println(2, "Stopping host...")
+	kuttilog.Println(kuttilog.Info, "Stopping host...")
 	newmachine.Stop()
 	// newhost.WaitForStateChange(25)
 

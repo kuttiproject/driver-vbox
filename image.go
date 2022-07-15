@@ -9,7 +9,7 @@ import (
 	"github.com/kuttiproject/workspace"
 )
 
-// vboximagedata is a data-only representation of the Cluster type,
+// vboximagedata is a data-only representation of the Image type,
 // used for serialization and output.
 type vboximagedata struct {
 	ImageK8sVersion string
@@ -42,13 +42,12 @@ func (i *Image) Status() drivercore.ImageStatus {
 }
 
 // Deprecated returns true if the image's version of Kubenetes is deprecated.
-// New Macines should not be created from such an image.
+// New Machines should not be created from such an image.
 func (i *Image) Deprecated() bool {
 	return i.imageDeprecated
 }
 
-// Fetch downloads the image from its source URL.
-func (i *Image) Fetch() error {
+func (i *Image) fetch(progress func(int64, int64)) error {
 	cachedir, err := vboxCacheDir()
 	if err != nil {
 		return err
@@ -58,7 +57,11 @@ func (i *Image) Fetch() error {
 	tempfilepath := path.Join(cachedir, tempfilename)
 
 	// Download file
-	err = workspace.DownloadFile(i.imageSourceURL, tempfilepath)
+	if progress != nil {
+		err = workspace.DownloadFileWithProgress(i.imageSourceURL, tempfilepath, progress)
+	} else {
+		err = workspace.DownloadFile(i.imageSourceURL, tempfilepath)
+	}
 	if err != nil {
 		return err
 	}
@@ -66,6 +69,35 @@ func (i *Image) Fetch() error {
 
 	// Add
 	return i.FromFile(tempfilepath)
+}
+
+// Fetch downloads the image from its source URL.
+func (i *Image) Fetch() error {
+	return i.fetch(nil)
+	// cachedir, err := vboxCacheDir()
+	// if err != nil {
+	// 	return err
+	// }
+
+	// tempfilename := fmt.Sprintf("kutti-k8s-%s.ovadownload", i.imageK8sVersion)
+	// tempfilepath := path.Join(cachedir, tempfilename)
+
+	// // Download file
+	// err = workspace.DownloadFile(i.imageSourceURL, tempfilepath)
+	// if err != nil {
+	// 	return err
+	// }
+	// defer workspace.RemoveFile(tempfilepath)
+
+	// // Add
+	// return i.FromFile(tempfilepath)
+}
+
+// FetchWithProgress downloads the image from the driver repository into the
+// local cache, and reports progress via the supplied callback. The callback
+// reports current and total in bytes.
+func (i *Image) FetchWithProgress(progress func(current int64, total int64)) error {
+	return i.fetch(progress)
 }
 
 // FromFile verifies an image file on a local path and copies it to the cache.
@@ -94,7 +126,7 @@ func (i *Image) PurgeLocal() error {
 	return nil
 }
 
-// MarshalJSON returns the JSON encoding of the cluster.
+// MarshalJSON returns the JSON encoding of the image.
 func (i *Image) MarshalJSON() ([]byte, error) {
 	savedata := vboximagedata{
 		ImageK8sVersion: i.imageK8sVersion,
@@ -108,7 +140,7 @@ func (i *Image) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON  parses and restores a JSON-encoded
-// cluster.
+// image.
 func (i *Image) UnmarshalJSON(b []byte) error {
 	var loaddata vboximagedata
 

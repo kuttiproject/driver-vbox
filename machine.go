@@ -159,7 +159,7 @@ func (vh *Machine) forwardingrulename(machineport int) string {
 	return fmt.Sprintf("Node %s Port %d", vh.qname(), machineport)
 }
 
-// ForwardPort creates a rule to forward the specified VM host port to the
+// ForwardPort creates a rule to forward the specified Machine port to the
 // specified physical host port. It does this by running the command:
 //   VBoxManage natnetwork modify --netname <networkname> --port-forward-4 <rule>
 // Port forwarding rule format is:

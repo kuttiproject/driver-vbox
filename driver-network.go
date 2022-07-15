@@ -52,6 +52,10 @@ each network. If there are zero networks, the output is:
 
 */
 func (vd *Driver) ListNetworks() ([]drivercore.Network, error) {
+	if !vd.validate() {
+		return nil, vd
+	}
+
 	// The default pattern for all our network names is "*kuttinet"
 	output, err := workspace.Runwithresults(
 		vd.vboxmanagepath,
@@ -119,6 +123,10 @@ func (vd *Driver) GetNetwork(clustername string) (drivercore.Network, error) {
 // It does this by running the command:
 //   VBoxManage natnetwork remove --netname <networkname>
 func (vd *Driver) DeleteNetwork(clustername string) error {
+	if !vd.validate() {
+		return vd
+	}
+
 	netname := vd.QualifiedNetworkName(clustername)
 
 	output, err := workspace.Runwithresults(
@@ -160,6 +168,10 @@ func (vd *Driver) DeleteNetwork(clustername string) error {
 // NewNetwork creates a new VirtualBox NAT network.
 // It uses the CIDR common to all Kutti networks, and is dhcp-enabled at start.
 func (vd *Driver) NewNetwork(clustername string) (drivercore.Network, error) {
+	if !vd.validate() {
+		return nil, vd
+	}
+
 	netname := vd.QualifiedNetworkName(clustername)
 
 	// Multiple VirtualBox NAT Networks can have the same IP range
