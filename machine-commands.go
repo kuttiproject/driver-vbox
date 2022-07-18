@@ -32,7 +32,7 @@ func (vh *Machine) runwithresults(execpath string, paramarray ...string) (string
 	}
 	params = append(params, paramarray...)
 
-	output, err := workspace.Runwithresults(
+	output, err := workspace.RunWithResults(
 		vh.driver.vboxmanagepath,
 		params...,
 	)

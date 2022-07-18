@@ -41,7 +41,7 @@ func (i *Image) Status() drivercore.ImageStatus {
 	return i.imageStatus
 }
 
-// Deprecated returns true if the image's version of Kubenetes is deprecated.
+// Deprecated returns true if the image's version of Kubernetes is deprecated.
 // New Machines should not be created from such an image.
 func (i *Image) Deprecated() bool {
 	return i.imageDeprecated

@@ -68,7 +68,7 @@ func (vh *Machine) SSHAddress() string {
 // and therefore its status will not change.
 // See WaitForStateChange().
 func (vh *Machine) Start() error {
-	output, err := workspace.Runwithresults(
+	output, err := workspace.RunWithResults(
 		vh.driver.vboxmanagepath,
 		"startvm",
 		vh.qname(),
@@ -90,7 +90,7 @@ func (vh *Machine) Start() error {
 // and therefore its status will not change.
 // See WaitForStateChange().
 func (vh *Machine) Stop() error {
-	_, err := workspace.Runwithresults(
+	_, err := workspace.RunWithResults(
 		vh.driver.vboxmanagepath,
 		"controlvm",
 		vh.qname(),
@@ -114,7 +114,7 @@ func (vh *Machine) Stop() error {
 //   VBoxManage controlvm <machinename> poweroff
 // This operation will set the status to drivercore.MachineStatusStopped.
 func (vh *Machine) ForceStop() error {
-	_, err := workspace.Runwithresults(
+	_, err := workspace.RunWithResults(
 		vh.driver.vboxmanagepath,
 		"controlvm",
 		vh.qname(),
@@ -141,7 +141,7 @@ func (vh *Machine) ForceStop() error {
 // WaitForStateChange should be called after a call to Start, before
 // any other operation. From observation, it should not be called _before_ Stop.
 func (vh *Machine) WaitForStateChange(timeoutinseconds int) {
-	workspace.Runwithresults(
+	workspace.RunWithResults(
 		vh.driver.vboxmanagepath,
 		"guestproperty",
 		"wait",
@@ -179,7 +179,7 @@ func (vh *Machine) ForwardPort(hostport int, machineport int) error {
 		machineport,
 	)
 
-	_, err := workspace.Runwithresults(
+	_, err := workspace.RunWithResults(
 		vh.driver.vboxmanagepath,
 		"natnetwork",
 		"modify",
@@ -208,7 +208,7 @@ func (vh *Machine) ForwardPort(hostport int, machineport int) error {
 // This driver writes the rule name as "Node <machinename> Port <machineport>".
 func (vh *Machine) UnforwardPort(machineport int) error {
 	rulename := vh.forwardingrulename(machineport)
-	_, err := workspace.Runwithresults(
+	_, err := workspace.RunWithResults(
 		vh.driver.vboxmanagepath,
 		"natnetwork",
 		"modify",
@@ -283,7 +283,7 @@ func (vh *Machine) ExecuteCommand(command drivercore.PredefinedCommand, params .
 }
 
 func (vh *Machine) get() error {
-	output, err := workspace.Runwithresults(
+	output, err := workspace.RunWithResults(
 		vh.driver.vboxmanagepath,
 		"guestproperty",
 		"enumerate",
