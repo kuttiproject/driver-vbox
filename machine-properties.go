@@ -36,7 +36,7 @@ var propMap = map[string]func(*Machine, string){
 }
 
 func (vh *Machine) getproperty(propname string) (string, bool) {
-	output, err := workspace.Runwithresults(
+	output, err := workspace.RunWithResults(
 		vh.driver.vboxmanagepath,
 		"guestproperty",
 		"get",
@@ -57,7 +57,7 @@ func (vh *Machine) getproperty(propname string) (string, bool) {
 }
 
 func (vh *Machine) setproperty(propname string, value string) error {
-	_, err := workspace.Runwithresults(
+	_, err := workspace.RunWithResults(
 		vh.driver.vboxmanagepath,
 		"guestproperty",
 		"set",
@@ -80,7 +80,7 @@ func (vh *Machine) setproperty(propname string, value string) error {
 }
 
 func (vh *Machine) unsetproperty(propname string) error {
-	_, err := workspace.Runwithresults(
+	_, err := workspace.RunWithResults(
 		vh.driver.vboxmanagepath,
 		"guestproperty",
 		"unset",

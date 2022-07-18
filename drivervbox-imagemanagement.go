@@ -21,7 +21,7 @@ var ImagesSourceURL = "https://github.com/kuttiproject/driver-vbox-images/releas
 
 var (
 	imagedata             = &imageconfigdata{}
-	imageconfigmanager, _ = workspace.NewFileConfigmanager(imagesConfigFile, imagedata)
+	imageconfigmanager, _ = workspace.NewFileConfigManager(imagesConfigFile, imagedata)
 )
 
 type imageconfigdata struct {
@@ -41,17 +41,17 @@ func (icd *imageconfigdata) Deserialize(data []byte) error {
 	return err
 }
 
-func (icd *imageconfigdata) Setdefaults() {
+func (icd *imageconfigdata) SetDefaults() {
 	icd.images = defaultimages()
 }
 
 func vboxCacheDir() (string, error) {
-	return workspace.Cachesubdir("driver-vbox")
+	return workspace.CacheSubDir("driver-vbox")
 }
 
 func vboxConfigDir() (string, error) {
 	//return workspace.Configsubdir("vbox")
-	return workspace.Configdir()
+	return workspace.ConfigDir()
 }
 
 func defaultimages() map[string]*Image {
@@ -128,7 +128,7 @@ func fetchimagelist() error {
 
 	// Load into object
 	tempimagedata := &imageconfigdata{}
-	tempconfigmanager, err := workspace.NewFileConfigmanager(tempfilename, tempimagedata)
+	tempconfigmanager, err := workspace.NewFileConfigManager(tempfilename, tempimagedata)
 	if err != nil {
 		return err
 	}

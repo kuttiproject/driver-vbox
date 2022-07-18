@@ -14,61 +14,12 @@ import (
 )
 
 func machinesBaseDir() (string, error) {
-	return workspace.Cachesubdir("driver-vbox-machines")
+	return workspace.CacheSubDir("driver-vbox-machines")
 }
 
 // QualifiedMachineName returns a name in the form <clustername>-<machinename>
 func (vd *Driver) QualifiedMachineName(machinename string, clustername string) string {
 	return clustername + "-" + machinename
-}
-
-/*ListMachines parses the list of VMs returned by
-    VBoxManage list vms
-As of VBoxManage 6.0.8r130520, the format is:
-
-  "Matsya" {e3509073-d188-4cca-8eaf-cb9f3be7ac4a}
-  "Krishna" {5d9b1b16-5059-42ae-a160-e93b470f940e}
-  "one" {06748689-7f4e-4915-8fbf-6111596f85a2}
-  "two" {eee169a7-09eb-473e-96be-5d37868c5d5e}
-  "minikube" {5bf78b43-3240-4f50-911b-fbc111d4d085}
-  "Node 1" {53b82a61-ae52-44c2-86d5-4c686502dd64}
-
-*/
-func (vd *Driver) ListMachines() ([]drivercore.Machine, error) {
-	if !vd.validate() {
-		return nil, vd
-	}
-
-	output, err := workspace.Runwithresults(
-		vd.vboxmanagepath,
-		"list",
-		"vms",
-	)
-	if err != nil {
-		return nil, fmt.Errorf("could not get list of VMs: %v", err)
-	}
-
-	// TODO: Write a better parser
-	result := []drivercore.Machine{}
-	lines := strings.Split(output, "\n")
-	if len(lines) < 1 {
-		return result, nil
-	}
-
-	actualcount := 0
-	for _, value := range lines {
-		line := strings.Split(value, " ")
-		if len(line) == 2 {
-			result = append(result, &Machine{
-				driver: vd,
-				name:   trimQuotes(line[0]),
-				status: drivercore.MachineStatusUnknown,
-			})
-			actualcount++
-		}
-	}
-
-	return result[:actualcount], err
 }
 
 // GetMachine returns the named machine, or an error.
@@ -105,7 +56,7 @@ func (vd *Driver) DeleteMachine(machinename string, clustername string) error {
 	}
 
 	qualifiedmachinename := vd.QualifiedMachineName(machinename, clustername)
-	output, err := workspace.Runwithresults(
+	output, err := workspace.RunWithResults(
 		vd.vboxmanagepath,
 		"unregistervm",
 		qualifiedmachinename,
@@ -162,7 +113,7 @@ func (vd *Driver) NewMachine(machinename string, clustername string, k8sversion 
 		return nil, err
 	}
 
-	l, err := workspace.Runwithresults(
+	l, err := workspace.RunWithResults(
 		vd.vboxmanagepath,
 		"import",
 		ovafile,
@@ -194,7 +145,7 @@ func (vd *Driver) NewMachine(machinename string, clustername string, k8sversion 
 	}
 	networkname := vd.QualifiedNetworkName(clustername)
 
-	_, err = workspace.Runwithresults(
+	_, err = workspace.RunWithResults(
 		vd.vboxmanagepath,
 		"modifyvm",
 		newmachine.qname(),
@@ -282,7 +233,6 @@ func (vd *Driver) NewMachine(machinename string, clustername string, k8sversion 
 
 	kuttilog.Println(kuttilog.Info, "Stopping host...")
 	newmachine.Stop()
-	// newhost.WaitForStateChange(25)
 
 	newmachine.status = drivercore.MachineStatusStopped
 

@@ -64,7 +64,7 @@ func (vd *Driver) validate() bool {
 	vd.vboxmanagepath = vbmpath
 
 	// test VBoxManage version
-	vbmversion, err := workspace.Runwithresults(vbmpath, "--version")
+	vbmversion, err := workspace.RunWithResults(vbmpath, "--version")
 	if err != nil {
 		vd.status = "Error"
 		vd.errormessage = err.Error()
