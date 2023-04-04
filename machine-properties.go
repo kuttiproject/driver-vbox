@@ -21,6 +21,8 @@ const (
 var (
 	properrorpattern, _ = regexp.Compile("error: (.*)\n")
 	proppattern, _      = regexp.Compile("Name: (.*), value: (.*), timestamp: (.*), flags:(.*)\n")
+	// VBoxManage in VirtualBox 7 changes the output pattern
+	proppattern2, _ = regexp.Compile("([^\\s]*)\\s*=\\s'(.*)'(.*)\n")
 )
 
 // When properties are parsed by parseprop(), certain properties
@@ -124,6 +126,12 @@ func (vh *Machine) parseProps(propstr string) {
 	}
 
 	results := proppattern.FindAllStringSubmatch(propstr, -1)
+
+	// In case there are no matches, use the VirtualBox 7 pattern
+	if results == nil {
+		results = proppattern2.FindAllStringSubmatch(propstr, -1)
+	}
+
 	for _, record := range results {
 		// record[1] - Name and record[2] - Value
 		// Run any configured action for a property
