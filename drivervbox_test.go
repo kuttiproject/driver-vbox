@@ -16,8 +16,8 @@ import (
 // The version and checksum of the driver-vbox image
 // to use for the test.
 const (
-	TESTK8SVERSION  = "1.23"
-	TESTK8SCHECKSUM = "2c9a6a24175f5589200b269f75f4043f4e97ed1ec7088f2d14a37a689624d770"
+	TESTK8SVERSION  = "1.27"
+	TESTK8SCHECKSUM = "0d2bbac1b72ce09e8a3e10cfe68a61e5413eb8fba5ff55c5808c1d89f34f78dd"
 )
 
 func TestDriverVBox(t *testing.T) {
