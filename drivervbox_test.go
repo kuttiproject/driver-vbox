@@ -16,8 +16,8 @@ import (
 // The version and checksum of the driver-vbox image
 // to use for the test.
 const (
-	TESTK8SVERSION  = "1.27"
-	TESTK8SCHECKSUM = "0d2bbac1b72ce09e8a3e10cfe68a61e5413eb8fba5ff55c5808c1d89f34f78dd"
+	TESTK8SVERSION  = "1.32"
+	TESTK8SCHECKSUM = ""
 )
 
 func TestDriverVBox(t *testing.T) {
@@ -28,10 +28,14 @@ func TestDriverVBox(t *testing.T) {
 	_, err := os.Stat(fmt.Sprintf("out/testserver/kutti-%v.ova", TESTK8SVERSION))
 	if err != nil {
 		t.Fatalf(
-			"Please download the version %v kutti image, and place it in the path out/testserver/kutti-%v.ova",
+			"Please download the version %v kutti image, and place it in the path out/testserver/kutti-%v.ova. Also update the checksum in drivervbox_test.go.",
 			TESTK8SVERSION,
 			TESTK8SVERSION,
 		)
+	}
+
+	if TESTK8SCHECKSUM == "" {
+		t.Fatalf("Please update the checksum in drivervbox_test.go.")
 	}
 
 	serverMux := http.NewServeMux()

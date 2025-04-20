@@ -12,12 +12,9 @@ import (
 
 // ImagesVersion defines the image repository version for the current version
 // of the driver.
-const ImagesVersion = "0.3"
+const ImagesVersion = "0.4"
 
 const imagesConfigFile = "driver-vbox-images.json"
-
-// ImagesSourceURL is the location where the master list of images can be found
-var ImagesSourceURL = "https://github.com/kuttiproject/driver-vbox-images/releases/download/v" + ImagesVersion + "/" + imagesConfigFile
 
 var (
 	imagedata             = &imageconfigdata{}
