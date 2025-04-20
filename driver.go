@@ -8,7 +8,7 @@ import (
 
 const (
 	driverName         = "vbox"
-	driverDescription  = "Kutti driver for VirtualBox 6.0 and above"
+	driverDescription  = "Kutti driver for VirtualBox 7.1 and above"
 	networkNameSuffix  = "kuttinet"
 	networkNamePattern = "*" + networkNameSuffix
 	dhcpaddress        = "192.168.125.3"
@@ -34,7 +34,7 @@ func (vd *Driver) Name() string {
 	return driverName
 }
 
-// Description returns "Kutti driver for VirtualBox 6.0 and above"
+// Description returns "Kutti driver for VirtualBox 7.1 and above"
 func (vd *Driver) Description() string {
 	return driverDescription
 }
@@ -72,8 +72,8 @@ func (vd *Driver) validate() bool {
 	}
 	var majorversion int
 	_, err = fmt.Sscanf(vbmversion, "%d", &majorversion)
-	if err != nil || majorversion < 6 {
-		err = fmt.Errorf("unsupported VBoxManage version %v. 6.0 and above are supported", vbmversion)
+	if err != nil || majorversion < 7 {
+		err = fmt.Errorf("unsupported VBoxManage version %v. 7.1 and above are supported", vbmversion)
 		vd.status = "Error"
 		vd.errormessage = err.Error()
 		return false
