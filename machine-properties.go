@@ -125,11 +125,12 @@ func (vh *Machine) parseProps(propstr string) {
 		return
 	}
 
-	results := proppattern.FindAllStringSubmatch(propstr, -1)
+	// Try the VirtualBox 7 property pattern first
+	results := proppattern2.FindAllStringSubmatch(propstr, -1)
 
-	// In case there are no matches, use the VirtualBox 7 pattern
+	// In case there are no matches, use the VirtualBox 6 pattern
 	if results == nil {
-		results = proppattern2.FindAllStringSubmatch(propstr, -1)
+		results = proppattern.FindAllStringSubmatch(propstr, -1)
 	}
 
 	for _, record := range results {

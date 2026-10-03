@@ -16,7 +16,7 @@ import (
 // The version and checksum of the driver-vbox image
 // to use for the test.
 const (
-	TESTK8SVERSION  = "1.32"
+	TESTK8SVERSION  = "1.37"
 	TESTK8SCHECKSUM = ""
 )
 

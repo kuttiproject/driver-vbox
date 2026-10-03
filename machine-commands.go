@@ -1,8 +1,6 @@
 package drivervbox
 
 import (
-	"fmt"
-
 	"github.com/kuttiproject/drivercore"
 	"github.com/kuttiproject/workspace"
 )
@@ -46,7 +44,7 @@ var vboxCommands = map[drivercore.PredefinedCommand]func(*Machine, ...string) er
 
 func renamemachine(vh *Machine, params ...string) error {
 	newname := params[0]
-	execname := fmt.Sprintf("/home/%s/kutti-installscripts/set-hostname.sh", vboxUsername)
+	execname := "/opt/kutti/scripts/set-hostname.sh"
 
 	_, err := vh.runwithresults(
 		"/usr/bin/sudo",
