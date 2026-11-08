@@ -9,7 +9,7 @@ import (
 	"path"
 )
 
-func findvboxmanage() (string, error) {
+func lookupvboxmanage() (string, error) {
 
 	// First, try looking it up on the path
 	toolpath, err := exec.LookPath("VBoxManage.exe")
