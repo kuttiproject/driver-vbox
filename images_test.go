@@ -67,6 +67,8 @@ type imageserver struct {
 	mu       sync.Mutex
 	images   []testimage
 	listcode int
+	rawlist  string
+	delay    time.Duration
 	files    map[string][]byte
 	requests map[string]int
 }
@@ -135,15 +137,44 @@ func (is *imageserver) fileRequests(version string) int {
 	return is.requests["/kutti-"+version+".ova"]
 }
 
-func (is *imageserver) handle(w http.ResponseWriter, r *http.Request) {
+// serveRawList makes the server answer requests for the list with the given
+// text, whatever the images are.
+func (is *imageserver) serveRawList(body string) {
 	is.mu.Lock()
 	defer is.mu.Unlock()
 
+	is.rawlist = body
+}
+
+// slowDownFiles makes the server wait before it answers a request for an
+// image file.
+func (is *imageserver) slowDownFiles(delay time.Duration) {
+	is.mu.Lock()
+	defer is.mu.Unlock()
+
+	is.delay = delay
+}
+
+func (is *imageserver) handle(w http.ResponseWriter, r *http.Request) {
+	is.mu.Lock()
+	delay := is.delay
 	is.requests[r.URL.Path]++
+	is.mu.Unlock()
+
+	if r.URL.Path != "/"+imagesConfigFile {
+		time.Sleep(delay)
+	}
+
+	is.mu.Lock()
+	defer is.mu.Unlock()
 
 	if r.URL.Path == "/"+imagesConfigFile {
 		if is.listcode != http.StatusOK {
 			http.Error(w, "no list", is.listcode)
+			return
+		}
+		if is.rawlist != "" {
+			w.Write([]byte(is.rawlist))
 			return
 		}
 

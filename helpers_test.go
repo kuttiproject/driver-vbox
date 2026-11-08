@@ -29,7 +29,22 @@ func (quietlogger) Println(v ...interface{})          {}
 // no VirtualBox.
 const fakeVBoxManageEnv = "KUTTI_TEST_FAKE_VBOXMANAGE"
 
+var probeSink []interface{}
+
 func TestMain(m *testing.M) {
+	// A process that only imports the package, for
+	// TestImportingThePackageDoesNothing. It refers to what a program that
+	// uses the driver refers to, so that the linker does not leave out the
+	// initialization of anything the driver needs, but it calls nothing.
+	if os.Getenv(importProbeEnv) != "" {
+		d := &Driver{}
+		probeSink = []interface{}{
+			d.UpdateImageList, d.ValidK8sVersion, d.K8sVersions, d.ListImages, d.GetImage,
+			d.NewMachine, d.Status,
+		}
+		os.Exit(0)
+	}
+
 	if os.Getenv(fakeVBoxManageEnv) != "" {
 		os.Exit(fakeVBoxManage(os.Args[1:]))
 	}

@@ -93,7 +93,7 @@ func (vd *Driver) NewMachine(machinename string, clustername string, k8sversion 
 
 	kuttilog.Println(kuttilog.Info, "Importing image...")
 
-	ovafile, err := imagepathfromk8sversion(k8sversion)
+	ovafile, err := imagestore.ImagePath(k8sversion)
 	if err != nil {
 		return nil, err
 	}
