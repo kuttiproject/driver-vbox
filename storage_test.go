@@ -1,16 +1,19 @@
-//go:build !darwin || !arm64
-
 package drivervbox
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
-func TestDefaultImagesVersionAndSourceURL(t *testing.T) {
-	if ImagesVersion != "0.5" {
-		t.Errorf("ImagesVersion is %q", ImagesVersion)
+// On every platform, the source URL is built from the version of the images
+// repository, which is ImagesVersion, and from the name of the list file.
+func TestImagesSourceURLIsBuiltFromImagesVersion(t *testing.T) {
+	if !strings.HasPrefix(ImagesSourceURL, "https://github.com/kuttiproject/") {
+		t.Errorf("ImagesSourceURL is %q", ImagesSourceURL)
 	}
 
-	want := "https://github.com/kuttiproject/driver-vbox-images/releases/download/v0.5/driver-vbox-images.json"
-	if ImagesSourceURL != want {
-		t.Errorf("ImagesSourceURL is %q, wanted %q", ImagesSourceURL, want)
+	suffix := "/releases/download/v" + ImagesVersion + "/driver-vbox-images.json"
+	if !strings.HasSuffix(ImagesSourceURL, suffix) {
+		t.Errorf("ImagesSourceURL is %q, expected it to end with %q", ImagesSourceURL, suffix)
 	}
 }

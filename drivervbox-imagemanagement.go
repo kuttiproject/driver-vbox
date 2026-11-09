@@ -5,10 +5,6 @@ import (
 	"github.com/kuttiproject/workspace"
 )
 
-// ImagesVersion defines the image repository version for the current version
-// of the driver.
-const ImagesVersion = "0.5"
-
 const imagesConfigFile = "driver-vbox-images.json"
 
 // imagestore manages the image list and the cached image files. See the
